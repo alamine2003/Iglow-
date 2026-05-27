@@ -1,0 +1,149 @@
+@startuml classes_MonProjet
+set namespaceSeparator none
+class "Command" as api.management.commands.firebase_push_claims.Command {
+  help : str
+  add_arguments(parser)
+  handle()
+}
+class "CustomUserAdmin" as api.admin.CustomUserAdmin {
+  fieldsets : tuple
+  list_display : tuple
+  list_filter : tuple
+}
+class "DevPromoteCoachView" as api.auth_views.DevPromoteCoachView {
+  authentication_classes : list
+  permission_classes : list
+  post(request)
+}
+class "FirebaseAuthentication" as api.authentication.FirebaseAuthentication {
+  keyword : str
+  authenticate(request)
+}
+class "IsCoachOrStaff" as api.permissions.IsCoachOrStaff {
+  allowed_roles : tuple
+  has_permission(request, view)
+}
+class "IsStaffRole" as api.permissions.IsStaffRole {
+  allowed_roles : tuple
+  has_permission(request, view)
+}
+class "MeView" as api.auth_views.MeView {
+  authentication_classes : list
+  permission_classes : list
+  get(request)
+}
+class "Meta" as api.serializers.ProductSerializer.Meta {
+  fields : str
+  model
+}
+class "Meta" as api.serializers.OrderSerializer.Meta {
+  fields : tuple
+  model
+  read_only_fields : tuple
+}
+class "Meta" as api.serializers.TicketSerializer.Meta {
+  fields : tuple
+  model
+}
+class "Migration" as api.migrations.0001_initial.Migration {
+  dependencies : list
+  initial : bool
+  operations : list
+}
+class "Migration" as api.migrations.0002_order_line_items_user_firebase_uid.Migration {
+  dependencies : list
+  operations : list
+}
+class "Order" as api.models.Order {
+  STATUS_CHOICES : tuple
+  client : ForeignKey
+  created_at : DateTimeField
+  line_items : JSONField
+  order_number : CharField
+  status : CharField
+  total : DecimalField
+}
+class "OrderAdmin" as api.admin.OrderAdmin {
+  list_display : tuple
+  list_filter : tuple
+  search_fields : tuple
+}
+class "OrderSerializer" as api.serializers.OrderSerializer {
+  clientId : SerializerMethodField
+  createdAt : SerializerMethodField
+  items : JSONField
+  num_commande : CharField
+  get_clientId(obj)
+  get_createdAt(obj)
+}
+class "OrderViewSet" as api.views.OrderViewSet {
+  authentication_classes : list
+  permission_classes : list
+  queryset
+  serializer_class
+  get_queryset()
+}
+class "Product" as api.models.Product {
+  category : CharField
+  created_at : DateTimeField
+  description : TextField
+  image_url : URLField
+  name : CharField
+  price : DecimalField
+  stock : IntegerField
+}
+class "ProductAdmin" as api.admin.ProductAdmin {
+  list_display : tuple
+  list_filter : tuple
+  search_fields : tuple
+}
+class "ProductSerializer" as api.serializers.ProductSerializer {
+}
+class "ProductViewSet" as api.views.ProductViewSet {
+  authentication_classes : list
+  queryset
+  serializer_class
+  get_permissions()
+}
+class "ReadOnlyOrStaff" as api.permissions.ReadOnlyOrStaff {
+  has_permission(request, view)
+}
+class "Ticket" as api.models.Ticket {
+  STATUS_CHOICES : tuple
+  client : ForeignKey
+  created_at : DateTimeField
+  status : CharField
+  subject : CharField
+}
+class "TicketAdmin" as api.admin.TicketAdmin {
+  list_display : tuple
+  list_filter : tuple
+  search_fields : tuple
+}
+class "TicketSerializer" as api.serializers.TicketSerializer {
+  clientId : SerializerMethodField
+  createdAt : DateTimeField
+  get_clientId(obj)
+}
+class "TicketViewSet" as api.views.TicketViewSet {
+  authentication_classes : list
+  permission_classes : list
+  queryset
+  serializer_class
+  get_queryset()
+}
+class "User" as api.models.User {
+  ROLE_CHOICES : tuple
+  firebase_uid : CharField
+  groups : ManyToManyField
+  phone : CharField
+  role : CharField
+  user_permissions : ManyToManyField
+}
+api.models.Order --o api.serializers.OrderSerializer.Meta : model
+api.models.Product --o api.serializers.ProductSerializer.Meta : model
+api.models.Ticket --o api.serializers.TicketSerializer.Meta : model
+api.serializers.OrderSerializer --o api.views.OrderViewSet : serializer_class
+api.serializers.ProductSerializer --o api.views.ProductViewSet : serializer_class
+api.serializers.TicketSerializer --o api.views.TicketViewSet : serializer_class
+@enduml

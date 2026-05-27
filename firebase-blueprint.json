@@ -1,0 +1,119 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile with role-based access",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string", "format": "email" },
+        "role": { "type": "string", "enum": ["ADMINISTRATEUR", "GESTIONNAIRE", "COACH", "CLIENT"] },
+        "nom": { "type": "string" },
+        "prenom": { "type": "string" },
+        "sexe": { "type": "string", "enum": ["M", "F", "AUTRE"] },
+        "tel": { "type": "string" },
+        "adresse": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["email", "role", "createdAt"]
+    },
+    "Category": {
+      "title": "Category",
+      "description": "Product category",
+      "type": "object",
+      "properties": {
+        "nom": { "type": "string" }
+      },
+      "required": ["nom"]
+    },
+    "Product": {
+      "title": "Product",
+      "description": "Skincare product",
+      "type": "object",
+      "properties": {
+        "nom": { "type": "string" },
+        "prix": { "type": "number" },
+        "desc": { "type": "string" },
+        "categoryId": { "type": "string" },
+        "stock": { "type": "number" },
+        "image": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["nom", "prix", "categoryId", "stock", "createdAt"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "Customer order",
+      "type": "object",
+      "properties": {
+        "num_commande": { "type": "string" },
+        "clientId": { "type": "string" },
+        "status": { "type": "string", "enum": ["EN_ATTENTE", "CONFIRMEE", "PAYEE", "EN_PREPARATION", "EN_LIVRAISON", "LIVREE"] },
+        "total": { "type": "number" },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "productId": { "type": "string" },
+              "quantity": { "type": "number" },
+              "price": { "type": "number" }
+            }
+          }
+        },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["num_commande", "clientId", "status", "total", "items", "createdAt"]
+    },
+    "Ticket": {
+      "title": "Ticket",
+      "description": "Consultation ticket",
+      "type": "object",
+      "properties": {
+        "clientId": { "type": "string" },
+        "coachId": { "type": "string" },
+        "sujet": { "type": "string" },
+        "status": { "type": "string", "enum": ["OUVERT", "FERME"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["clientId", "sujet", "status", "createdAt"]
+    },
+    "Message": {
+      "title": "Message",
+      "description": "Message within a ticket",
+      "type": "object",
+      "properties": {
+        "ticketId": { "type": "string" },
+        "senderId": { "type": "string" },
+        "text": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["ticketId", "senderId", "text", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "User profiles"
+    },
+    "/categories/{categoryId}": {
+      "schema": { "$ref": "#/entities/Category" },
+      "description": "Product categories"
+    },
+    "/products/{productId}": {
+      "schema": { "$ref": "#/entities/Product" },
+      "description": "Products catalog"
+    },
+    "/orders/{orderId}": {
+      "schema": { "$ref": "#/entities/Order" },
+      "description": "Customer orders"
+    },
+    "/tickets/{ticketId}": {
+      "schema": { "$ref": "#/entities/Ticket" },
+      "description": "Consultation tickets"
+    },
+    "/tickets/{ticketId}/messages/{messageId}": {
+      "schema": { "$ref": "#/entities/Message" },
+      "description": "Messages in a ticket"
+    }
+  }
+}

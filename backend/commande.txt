@@ -1,0 +1,22 @@
+Perfect! The migrations have been applied successfully. Your Django backend is now fully set up with the database tables created.
+
+Backend API: Available at http://localhost:8000/api/
+API Docs: http://localhost:8000/api/docs/
+Admin Panel: http://localhost:8000/admin/ (create a superuser with docker compose exec web python manage.py createsuperuser if needed)
+PgAdmin: http://localhost:5050 (use credentials from .env)
+For the frontend, run npm run dev in the root directory (iglow) to start the React app on http://localhost:3000.
+
+
+
+# --- Firebase (frontend : comptes utilisateurs) ---
+# Activer Email/Password :
+https://console.firebase.google.com/project/gen-lang-client-0374328458/authentication/providers
+
+# --- Firebase Admin (backend : verifier les jetons API) ---
+# 1) Generer la cle JSON compte de service :
+https://console.firebase.google.com/project/gen-lang-client-0374328458/settings/serviceaccounts/adminsdk
+# 2) Enregistrer sous backend/secrets/firebase-service-account.json
+# 3) backend/.env : FIREBASE_CREDENTIALS_PATH=/app/secrets/firebase-service-account.json
+# 4) docker compose up --build
+
+# Frontend : copier .env.example vers .env a la racine avec VITE_API_URL=http://localhost:8000

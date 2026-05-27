@@ -1,0 +1,6 @@
+{
+  "name": "iGlow",
+  "description": "Plateforme interactive de conseil dermatologique et e-commerce skincare",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": []
+}

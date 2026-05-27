@@ -1,0 +1,37 @@
+digraph "packages_MonProjet" {
+rankdir=BT
+charset="utf-8"
+"api" [color="black", label=<api>, shape="box", style="solid"];
+"api.admin" [color="black", label=<api.admin>, shape="box", style="solid"];
+"api.auth_views" [color="black", label=<api.auth_views>, shape="box", style="solid"];
+"api.authentication" [color="black", label=<api.authentication>, shape="box", style="solid"];
+"api.firebase_service" [color="black", label=<api.firebase_service>, shape="box", style="solid"];
+"api.management" [color="black", label=<api.management>, shape="box", style="solid"];
+"api.management.commands" [color="black", label=<api.management.commands>, shape="box", style="solid"];
+"api.management.commands.firebase_push_claims" [color="black", label=<api.management.commands.firebase_push_claims>, shape="box", style="solid"];
+"api.migrations" [color="black", label=<api.migrations>, shape="box", style="solid"];
+"api.migrations.0001_initial" [color="black", label=<api.migrations.0001_initial>, shape="box", style="solid"];
+"api.migrations.0002_order_line_items_user_firebase_uid" [color="black", label=<api.migrations.0002_order_line_items_user_firebase_uid>, shape="box", style="solid"];
+"api.models" [color="black", label=<api.models>, shape="box", style="solid"];
+"api.permissions" [color="black", label=<api.permissions>, shape="box", style="solid"];
+"api.serializers" [color="black", label=<api.serializers>, shape="box", style="solid"];
+"api.services" [color="black", label=<api.services>, shape="box", style="solid"];
+"api.services.user_sync" [color="black", label=<api.services.user_sync>, shape="box", style="solid"];
+"api.urls" [color="black", label=<api.urls>, shape="box", style="solid"];
+"api.views" [color="black", label=<api.views>, shape="box", style="solid"];
+"api.admin" -> "api.models" [arrowhead="open", arrowtail="none"];
+"api.auth_views" -> "api.authentication" [arrowhead="open", arrowtail="none"];
+"api.auth_views" -> "api.services.user_sync" [arrowhead="open", arrowtail="none"];
+"api.authentication" -> "api.firebase_service" [arrowhead="open", arrowtail="none"];
+"api.authentication" -> "api.services.user_sync" [arrowhead="open", arrowtail="none"];
+"api.management.commands.firebase_push_claims" -> "api.services.user_sync" [arrowhead="open", arrowtail="none"];
+"api.serializers" -> "api.models" [arrowhead="open", arrowtail="none"];
+"api.services" -> "api.services.user_sync" [arrowhead="open", arrowtail="none"];
+"api.services.user_sync" -> "api.firebase_service" [arrowhead="open", arrowtail="none"];
+"api.urls" -> "api.auth_views" [arrowhead="open", arrowtail="none"];
+"api.urls" -> "api.views" [arrowhead="open", arrowtail="none"];
+"api.views" -> "api.authentication" [arrowhead="open", arrowtail="none"];
+"api.views" -> "api.models" [arrowhead="open", arrowtail="none"];
+"api.views" -> "api.permissions" [arrowhead="open", arrowtail="none"];
+"api.views" -> "api.serializers" [arrowhead="open", arrowtail="none"];
+}
