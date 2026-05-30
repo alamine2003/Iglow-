@@ -4,6 +4,16 @@ import { Camera, Scan, X, Sparkles, ArrowRight, RefreshCw } from 'lucide-react';
 import { GoogleGenAI } from '@google/genai';
 import { useNavigate } from 'react-router-dom';
 import Markdown from 'react-markdown';
+import { apiFetch } from '../api/client';
+
+interface StockProduct {
+  id: number;
+  name: string;
+  description: string;
+  category_name: string;
+  price: number;
+  stock: number;
+}
 
 function getGeminiApiKey(): string {
   const key = import.meta.env.VITE_GEMINI_API_KEY;
@@ -30,7 +40,18 @@ export default function Scanner() {
   const [displayedText, setDisplayedText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [stockProducts, setStockProducts] = useState<StockProduct[]>([]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    apiFetch('/api/products/', null)
+      .then((res) => res.ok ? res.json() : [])
+      .then((data: StockProduct[]) => {
+        const inStock = (Array.isArray(data) ? data : []).filter((p) => p.stock > 0);
+        setStockProducts(inStock);
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (!analysis) {
@@ -108,22 +129,34 @@ export default function Scanner() {
 
     try {
       const ai = createGeminiClient();
+
+      const catalogSection = stockProducts.length > 0
+        ? `\n\n---\n**Catalogue iGlow disponible en stock (recommande uniquement parmi ces produits) :**\n${stockProducts
+            .map((p) => `- **${p.name}** (${p.category_name}) — ${Number(p.price).toLocaleString('fr-FR')} FCFA — ${p.description}`)
+            .join('\n')}\n---`
+        : '';
+
+      const prompt = `Tu es un dermatologue expert IA et conseiller beauté iGlow. Analyse cette image du visage de l'utilisateur et fournis une réponse structurée en français avec les sections suivantes :
+
+1. **Type de peau estimé** (grasse, sèche, mixte, sensible, normale)
+2. **État des pores**
+3. **Niveau d'hydratation apparent**
+4. **Problématiques détectées** (rougeurs, rides, acné, taches, etc.)
+5. **Routine recommandée** : propose 2 à 3 produits spécifiques issus du catalogue ci-dessous, en expliquant pourquoi chaque produit est adapté à ce type de peau.${catalogSection}
+
+Sois bienveillant, professionnel et concis. Formate la réponse en Markdown.`;
+
       const response = await ai.models.generateContent({
         model: 'gemini-2.5-flash',
         contents: [
           {
             role: 'user',
             parts: [
-              { text: "Tu es un dermatologue expert IA. Analyse cette image de la peau du visage de l'utilisateur. Fournis une analyse structurée en français avec les points suivants : \n\n1. **Type de peau estimé** (grasse, sèche, mixte, etc.)\n2. **État des pores**\n3. **Niveau d'hydratation apparent**\n4. **Problématiques détectées** (rougeurs, rides, acné, etc.)\n\nEnsuite, recommande 2 ou 3 types de produits génériques (ex: Sérum Vitamine C, Crème hydratante riche) pour améliorer cette peau. Sois bienveillant, professionnel et concis. Formate la réponse en Markdown." },
-              {
-                inlineData: {
-                  data: base64Image,
-                  mimeType: 'image/jpeg'
-                }
-              }
-            ]
-          }
-        ]
+              { text: prompt },
+              { inlineData: { data: base64Image, mimeType: 'image/jpeg' } },
+            ],
+          },
+        ],
       });
 
       if (response.text) {

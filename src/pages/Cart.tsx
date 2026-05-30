@@ -5,6 +5,7 @@ import { useCartStore } from '../store/useCartStore';
 import { useAuthStore } from '../store/useAuthStore';
 import { addDoc, collection } from 'firebase/firestore';
 import { db, handleFirestoreError, OperationType } from '../firebase';
+import { apiFetch } from '../api/client';
 import { useNavigate } from 'react-router-dom';
 
 export default function Cart() {
@@ -21,22 +22,38 @@ export default function Cart() {
 
     setIsCheckingOut(true);
     try {
+      const lineItems = items.map(i => ({
+        productId: i.productId,
+        quantity: i.quantity,
+        price: i.prix,
+      }));
+
+      // Vérification et décrémentation du stock côté Django (atomique)
+      const token = await user.getIdToken();
+      const stockRes = await apiFetch('/api/orders/deduct-stock/', token, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items: lineItems }),
+      });
+
+      if (!stockRes.ok) {
+        const err = await stockRes.json().catch(() => ({}));
+        alert(err.error ?? 'Stock insuffisant, commande annulée.');
+        return;
+      }
+
+      // Stock ok → on enregistre la commande dans Firestore
       const orderData = {
-        num_commande: `IGLOW-${new Date().toISOString().slice(0,10).replace(/-/g,'')}-${Math.floor(Math.random() * 10000)}`,
+        num_commande: `IGLOW-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${Math.floor(Math.random() * 10000)}`,
         clientId: user.uid,
         status: 'EN_ATTENTE',
         total: total(),
-        items: items.map(i => ({
-          productId: i.productId,
-          quantity: i.quantity,
-          price: i.prix
-        })),
-        createdAt: new Date().toISOString()
+        items: lineItems,
+        createdAt: new Date().toISOString(),
       };
 
       await addDoc(collection(db, 'orders'), orderData);
       clearCart();
-      // Simulate Wave Payment redirect or success
       alert('Commande créée avec succès ! Redirection vers Wave (simulation)...');
       navigate('/profile');
     } catch (error) {

@@ -116,7 +116,7 @@ class OrderSerializer(serializers.ModelSerializer):
             'createdAt',
             'created_at',
         )
-        read_only_fields = ('id', 'num_commande', 'clientId', 'clientEmail', 'clientName', 'createdAt')
+        read_only_fields = ('id', 'client', 'order_number', 'num_commande', 'clientId', 'clientEmail', 'clientName', 'createdAt', 'created_at')
 
     def get_clientId(self, obj):
         client = getattr(obj, 'client', None)
